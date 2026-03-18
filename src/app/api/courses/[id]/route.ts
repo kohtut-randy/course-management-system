@@ -5,7 +5,7 @@ import { verifyAuth } from "@/lib/middleware/auth";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     await initializeDatabase();
@@ -15,14 +15,19 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const courseId = params.id;
+    const { id: courseId } = await params;
+    console.log("GET /api/courses/[id] - Requested courseId:", courseId);
+    console.log("GET /api/courses/[id] - User ID:", user.id);
 
     const course = await CourseService.getCourseWithMaterials(
       courseId,
       user.id,
     );
 
+    console.log("GET /api/courses/[id] - Found course:", course);
+
     if (!course) {
+      console.log("GET /api/courses/[id] - Course not found for user");
       return NextResponse.json({ error: "Course not found" }, { status: 404 });
     }
 
@@ -38,7 +43,7 @@ export async function GET(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     await initializeDatabase();
@@ -48,7 +53,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const courseId = params.id;
+    const { id: courseId } = await params;
 
     await CourseService.deleteCourse(courseId, user.id);
 

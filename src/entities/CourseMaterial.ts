@@ -13,6 +13,12 @@ export class CourseMaterial {
   id!: string;
 
   @Column()
+  title!: string;
+
+  @Column({ nullable: true })
+  description?: string;
+
+  @Column()
   filename!: string;
 
   @Column()

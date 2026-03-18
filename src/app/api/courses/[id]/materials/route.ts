@@ -91,7 +91,11 @@ export async function POST(
       };
     }
 
-    const material = await CourseService.addMaterial(materialData, courseId);
+    const material = await CourseService.createMaterial(
+      materialData,
+      courseId,
+      user.id,
+    );
 
     return NextResponse.json({ material, success: true });
   } catch (error) {
@@ -130,9 +134,9 @@ export async function DELETE(
       );
     }
 
-    await CourseService.deleteMaterial(materialId, user.id);
+    const result = await CourseService.deleteMaterialById(materialId, user.id);
 
-    return NextResponse.json({ success: true, message: "Material deleted" });
+    return NextResponse.json(result);
   } catch (error) {
     console.error("Material deletion error:", error);
     const errorMessage =

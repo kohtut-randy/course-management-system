@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
-// import CourseCreateMaterial from "@/components/CourseCreateMaterial";
+import CourseCreateMaterial from "@/components/CourseCreateMaterial";
+import CourseEditMaterial from "@/components/CourseEditMaterial";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -12,6 +13,8 @@ interface Material {
   title: string;
   description?: string;
   originalName: string;
+  mimeType: string;
+  path: string;
   uploadedAt: string;
   size: number;
 }
@@ -33,6 +36,7 @@ export default function CourseDetailPage() {
   const [deletingMaterialId, setDeletingMaterialId] = useState<string | null>(
     null,
   );
+  const [editingMaterial, setEditingMaterial] = useState<Material | null>(null);
   const courseId = Array.isArray(params.id) ? params.id[0] : params.id;
 
   useEffect(() => {
@@ -117,6 +121,14 @@ export default function CourseDetailPage() {
     }
   };
 
+  const handleEditMaterial = (material: Material) => {
+    setEditingMaterial(material);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingMaterial(null);
+  };
+
   const formatFileSize = (bytes: number) => {
     if (bytes < 1024) return bytes + " B";
     if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
@@ -159,10 +171,21 @@ export default function CourseDetailPage() {
         </CardContent>
       </Card>
 
-      {/* <CourseCreateMaterial
+      <CourseCreateMaterial
         courseId={course.id}
         onMaterialCreated={fetchCourse}
-      /> */}
+      />
+
+      {editingMaterial && (
+        <CourseEditMaterial
+          material={editingMaterial}
+          onMaterialUpdated={() => {
+            setEditingMaterial(null);
+            fetchCourse();
+          }}
+          onCancel={handleCancelEdit}
+        />
+      )}
 
       <Card>
         <CardHeader>
@@ -191,15 +214,24 @@ export default function CourseDetailPage() {
                       {new Date(material.uploadedAt).toLocaleDateString()}
                     </p>
                   </div>
-                  <Button
-                    onClick={() => handleDeleteMaterial(material.id)}
-                    disabled={deletingMaterialId === material.id}
-                    className="bg-red-500 hover:bg-red-600 text-white text-sm"
-                  >
-                    {deletingMaterialId === material.id
-                      ? "Deleting..."
-                      : "Delete"}
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => handleEditMaterial(material)}
+                      disabled={deletingMaterialId === material.id}
+                      className="bg-blue-500 hover:bg-blue-600 text-white text-sm"
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      onClick={() => handleDeleteMaterial(material.id)}
+                      disabled={deletingMaterialId === material.id}
+                      className="bg-red-500 hover:bg-red-600 text-white text-sm"
+                    >
+                      {deletingMaterialId === material.id
+                        ? "Deleting..."
+                        : "Delete"}
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>

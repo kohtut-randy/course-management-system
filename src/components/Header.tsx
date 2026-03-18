@@ -20,18 +20,11 @@ export default function Header() {
               <Link href="/courses">
                 <Button variant="ghost">My Courses</Button>
               </Link>
-              <Link href="/courses/create">
-                <Button>Create Course</Button>
-              </Link>
               <Button onClick={signOut} variant="outline">
                 Logout
               </Button>
             </>
-          ) : (
-            <Link href="/login">
-              <Button>Login</Button>
-            </Link>
-          )}
+          ) : null}
         </div>
       </nav>
     </header>
