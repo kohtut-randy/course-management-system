@@ -108,4 +108,44 @@ export class CourseService {
       throw error;
     }
   }
+
+  static async deleteCourse(courseId: string, userId: string) {
+    try {
+      const courseRepository = AppDataSource.getRepository(Course);
+      const materialRepository = AppDataSource.getRepository(CourseMaterial);
+
+      const course = await courseRepository.findOne({
+        where: { id: courseId, userId },
+        relations: ["materials"],
+      });
+
+      if (!course) {
+        throw new Error("Course not found");
+      }
+
+      // Delete all associated materials and their files
+      const fs = require("fs/promises");
+      for (const material of course.materials || []) {
+        try {
+          if (material.path) {
+            await fs.unlink(material.path);
+          }
+        } catch (fileError) {
+          console.error("Error deleting file:", fileError);
+          // Continue even if file deletion fails
+        }
+      }
+
+      // Delete all materials from database
+      if (course.materials && course.materials.length > 0) {
+        await materialRepository.remove(course.materials);
+      }
+
+      // Delete the course
+      return await courseRepository.remove(course);
+    } catch (error) {
+      console.error("Error deleting course:", error);
+      throw error;
+    }
+  }
 }
