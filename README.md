@@ -104,6 +104,13 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
+### 6. Default Login Credentials
+
+For testing purposes, you can use these default credentials:
+
+- **Email**: hello@example.com
+- **Password**: 12345678
+
 ## 📁 Project Structure
 
 ```
